@@ -29,11 +29,11 @@ double* solve_seidel(double** a, double* b, int n, double epsilon, int max_itera
             double s = 0;
             for (int j = 0; j < n; j++) {
                 if(j != i) {
-                    s += a[i][j] / a[i][i] * result[j]; // TODO проерить формулу a[i][i] не было
+                    s += a[i][j] / a[i][i] * result[j];
                 }
             }
 
-            result[i] = b[i] / a[i][i] - s; // TODO проерить порядок в формуле
+            result[i] = b[i] / a[i][i] - s;
 
             relative[i] = fabs(previous[i] - result[i]);
 
@@ -129,7 +129,7 @@ void solve(double** a, double* b, int n, double epsilon, int max_iterations = 5)
     cout << "Проверим диагональное преобладание..." << endl;
 
     if(!diagonal_dominance(a, n)) {
-        cout << "Нет диагонального преобладания! Программа попытается привести СЛАУ к диагональному преобладанию..." << endl;
+        cout << "Нет диагонального преобладания! Программа попытается привести СЛУ к диагональному преобладанию..." << endl;
         transposition(a, n);
         cout << "Матрица после приведения к диагональному преобладанию:" << endl;
         print_SLE(a, b, n);
