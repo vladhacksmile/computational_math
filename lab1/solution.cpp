@@ -6,17 +6,13 @@ using namespace std;
 /*
  * Решает СЛУ методом Гаусса-Зейделя и выводит количество итераций/вектор погрешностей
  */
-double* solve_seidel(double** a, double* b, int n, double epsilon, int max_iterations = 5) {
-    int k = 1;
+double* solve_seidel(double** a, double* b, int n, double epsilon, int max_iterations = 10) {
+    int k = 0;
     int M = max_iterations;
     double* previous = new double[n];
     double* result = new double[n];
     double* relative = new double[n];
     double error;
-
-    for (int i = 0; i < n; i++) {
-        result[i] = b[i] / a[i][i];
-    } // Считаем первое приближение
 
     do {
         error = 0;
@@ -29,11 +25,11 @@ double* solve_seidel(double** a, double* b, int n, double epsilon, int max_itera
             double s = 0;
             for (int j = 0; j < n; j++) {
                 if(j != i) {
-                    s += a[i][j] / a[i][i] * result[j]; // TODO проерить формулу a[i][i] не было
+                    s += a[i][j] / a[i][i] * result[j];
                 }
             }
 
-            result[i] = b[i] / a[i][i] - s; // TODO проерить порядок в формуле
+            result[i] = b[i] / a[i][i] - s;
 
             relative[i] = fabs(previous[i] - result[i]);
 
@@ -54,32 +50,12 @@ double* solve_seidel(double** a, double* b, int n, double epsilon, int max_itera
     cout << "Вектор погрешностей:" << endl;
 
     for (int i = 0; i < n; i++) {
-        cout << "[" << i << "] - " << relative[i] << endl;
+        cout << relative[i] << endl;
     }
+
+    cout << endl;
 
     return result;
-}
-
-/*
- * Преводит матрицу к диагональному преобладанию
- */
-void transposition(double** a, int n) {
-    for (int i = 0; i < n; i++) {
-        double sum = 0;
-        for (int j = 0; j < n; j++) {
-            sum += abs(a[i][j]);
-        }
-        sum -= abs(a[i][i]);
-        if (sum >= a[i][i]) {
-            for (int k = 0; k < n; k++) {
-                if (a[k][i] > a[i][i]) {
-                    double *temp = a[k];
-                    a[k] = a[i];
-                    a[i] = temp;
-                }
-            }
-        }
-    }
 }
 
 /*
@@ -105,6 +81,33 @@ bool diagonal_dominance(double** a, int n) {
 }
 
 /*
+ * Преводит матрицу к диагональному преобладанию
+ */
+void transposition(double** a, int n) {
+    for (int i = 0; i < n; i++) {
+        double sum = 0;
+        for (int j = 0; j < n; j++) {
+            sum += abs(a[i][j]);
+        }
+        sum -= abs(a[i][i]);
+        if (sum >= a[i][i]) {
+            for (int k = 0; k < n; k++) {
+                if (a[k][i] > a[i][i]) {
+                    double *temp = a[k];
+                    a[k] = a[i];
+                    a[i] = temp;
+                }
+            }
+        }
+    }
+
+    if(!diagonal_dominance(a, n)) {
+        cout << "Не удалось привести матрицу к диагональному преобладанию!" << endl;
+        exit(0);
+    }
+}
+
+/*
  * Выводит на экран СЛУ
  */
 void print_SLE(double** a, double* b, int n) {
@@ -125,11 +128,11 @@ void print_SLE(double** a, double* b, int n) {
  * Содержит проверку на диагональное преобладание
  * Текстовое сопровождение с процессом выполнения
  */
-void solve(double** a, double* b, int n, double epsilon, int max_iterations = 5) {
+void solve(double** a, double* b, int n, double epsilon, int max_iterations = 10) {
     cout << "Проверим диагональное преобладание..." << endl;
 
     if(!diagonal_dominance(a, n)) {
-        cout << "Нет диагонального преобладания! Программа попытается привести СЛАУ к диагональному преобладанию..." << endl;
+        cout << "Нет диагонального преобладания! Программа попытается привести СЛУ к диагональному преобладанию..." << endl;
         transposition(a, n);
         cout << "Матрица после приведения к диагональному преобладанию:" << endl;
         print_SLE(a, b, n);
@@ -144,7 +147,21 @@ void solve(double** a, double* b, int n, double epsilon, int max_iterations = 5)
     cout << "Вектора неизвестных:" << endl;
 
     for (int i = 0; i < n; i++) {
-        cout << x[i] << "\t";
+        cout << x[i] << endl;
+    }
+
+    cout << endl;
+
+    cout << "Вектора невязки:" << endl;
+
+    for (int i = 0; i < n; i++) {
+        double temp = 0;
+        for (int j = 0; j <= n; j++) {
+            temp += a[i][j] * x[j];
+            if(j == n) {
+                cout << b[i] - temp << endl;
+            }
+        }
     }
 }
 
@@ -234,3 +251,4 @@ int main() {
 
     return 0;
 }
+// tamalysheva@itmo.ru
